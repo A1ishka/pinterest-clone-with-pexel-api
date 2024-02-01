@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">pinterest_pexels</string>
+    <string name="image_not_found">Image not found</string>
+    <string name="explore">Explore</string>
+</resources>

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Pinterest_pexels" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.Pinterest_pexels" parent="android:Theme.Material.Light.NoActionBar" >
+        <item name="android:windowBackground">@color/ruby</item>
+    </style>
     <style name="Theme.App.Starting" parent="Theme.Pinterest_pexels">
         <item name="windowSplashScreenBackground">@color/ruby</item>
         <item name="postSplashScreenTheme">@style/Theme.Pinterest_pexels</item>

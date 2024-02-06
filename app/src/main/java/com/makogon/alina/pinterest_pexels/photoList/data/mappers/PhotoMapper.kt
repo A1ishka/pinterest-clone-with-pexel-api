@@ -36,6 +36,21 @@ fun PhotoDto.toPhotoEntity(): PhotoEntity {
     )
 }
 
+fun PhotoDto.toPhoto(): Photo {
+    return Photo(
+        alt=alt?: "",
+        avg_color=avg_color?: "",
+        height=height?: 0,
+        width=width?:0,
+        liked=liked?:false,
+        photographer=photographer?: "",
+        photographer_id=photographer_id?:0,
+        photographer_url=photographer_url?: "",
+        url=url?: "",
+        id=id?:-1
+    )
+}
+
 fun BookmarkedPhotoEntity.toPhoto(): Photo {
     return Photo(
         alt=alt,

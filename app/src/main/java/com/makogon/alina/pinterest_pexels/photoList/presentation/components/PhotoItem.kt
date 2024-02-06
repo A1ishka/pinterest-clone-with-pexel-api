@@ -7,12 +7,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ImageNotSupported
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,21 +35,23 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.makogon.alina.pinterest_pexels.R
 import com.makogon.alina.pinterest_pexels.core.presentation.NavItems
 import com.makogon.alina.pinterest_pexels.photoList.data.remote.PhotoApi
+import com.makogon.alina.pinterest_pexels.photoList.data.remote.PhotoApi.Companion.API_KEY
 import com.makogon.alina.pinterest_pexels.photoList.domain.model.Photo
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalMaterial3Api
 @Composable
-fun PhotoItem(photo: Photo, navHostController: NavHostController) {
+fun PhotoItem(photo: Photo?, navHostController: NavHostController, modifier: Modifier) {
     val showAuthorInfo = remember { mutableStateOf(false) }
-
 
     val ImageState = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
-            .data(PhotoApi.IMAGE_BASE_URL + photo?.url)
-            //.size(Size.ORIGINAL)
+            .data(/*PhotoApi.IMAGE_BASE_URL +*/ photo?.url)
+            .placeholder(R.drawable.placeholder)
+            .setHeader("Authorization", API_KEY)
             .build()
     ).state
 
@@ -53,20 +62,19 @@ fun PhotoItem(photo: Photo, navHostController: NavHostController) {
                     .fillMaxWidth()
                     .padding(8.dp)
                     .aspectRatio(1f)
-                    .clip(shape = RoundedCornerShape(4.dp))
+                    .clip(shape = RoundedCornerShape(7.dp))
                     .clickable {
-                        navHostController.navigate(NavItems.Details.route + "/${photo.id}")
+                        navHostController.navigate(NavItems.Details.route + "/${photo?.id}")
                     },
-                //elevation = 4.dp
-            ) {
+                ) {
                 if (ImageState is AsyncImagePainter.State.Success) {
                     Box {
-//                        Image(
-//                            painter = rememberAsyncImagePainter(request = photo.url),
-//                            //painter = ImageState.result,
-//                            contentDescription = null,
-//                            modifier = Modifier.fillMaxSize()
-//                        )
+                        Image(
+                            painter = ImageState.painter,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize()
+                                .defaultMinSize(minWidth = 30.dp, minHeight = 70.dp)
+                        )
                         if (showAuthorInfo.value) {
                             Column(
                                 modifier = Modifier
@@ -75,8 +83,7 @@ fun PhotoItem(photo: Photo, navHostController: NavHostController) {
                                     .padding(8.dp)
                             ) {
                                 Text(
-                                    text = "Author: ${photo.photographer}",
-                                    //style = MaterialTheme.typography.body2,
+                                    text = "Author: ${photo?.photographer}",
                                     color = Color.White
                                 )
                             }
@@ -84,12 +91,21 @@ fun PhotoItem(photo: Photo, navHostController: NavHostController) {
                     }
                 }
                 if (ImageState is AsyncImagePainter.State.Error) {
-
-                    //заглушка на картинку
-
-
-
-
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(6.dp)
+                            .height(250.dp)
+                            .clip(RoundedCornerShape(22.dp))
+                            .background(MaterialTheme.colorScheme.primaryContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(70.dp),
+                            imageVector = Icons.Rounded.ImageNotSupported,
+                            contentDescription = null
+                        )
+                    }
                 }
             }
         }

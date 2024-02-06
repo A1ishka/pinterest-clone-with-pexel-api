@@ -1,7 +1,5 @@
 package com.makogon.alina.pinterest_pexels.core.presentation
 
-import com.makogon.alina.pinterest_pexels.R
-
 sealed class NavItems(
     val route: String
 ) {
@@ -12,7 +10,8 @@ sealed class NavItems(
     object Bookmarks : NavItems(
         route = "bookmarks"
     )
-    object Details: NavItems(
-        route="details"
+
+    object Details : NavItems(
+        route = "details"
     )
 }

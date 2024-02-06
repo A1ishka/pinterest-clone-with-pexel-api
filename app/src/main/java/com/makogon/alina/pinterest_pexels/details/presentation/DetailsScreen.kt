@@ -1,7 +1,9 @@
 package com.makogon.alina.pinterest_pexels.details.presentation
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,11 +17,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Download
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -47,32 +49,26 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.makogon.alina.pinterest_pexels.R
 import com.makogon.alina.pinterest_pexels.photoList.data.remote.PhotoApi
+import com.makogon.alina.pinterest_pexels.photoList.util.downloader.AndroidDownloader
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailsScreen(backStackEntry: NavBackStackEntry, navController: NavController) {
-
+fun DetailsScreen(
+    backStackEntry: NavBackStackEntry,
+    navController: NavController,
+    context: Context
+) {
     val detailsViewModel = hiltViewModel<DetailsViewModel>()
     val detailsState = detailsViewModel.detailsState.collectAsState().value
 
     var isSelected by remember { mutableStateOf(false) }
 
-//    try {
-//        val details = detailsRepository.getDetailsById(id)
-//        isSelected = details.isSelected
-//    } catch (e: Exception) {
-//        // Обработка исключения, если запись не найдена
-//    }
-
-
-
-    //разделить запросы из бд и сетевой в зависимости от картинки...............
-
     val ImageState = rememberAsyncImagePainter(
         model = ImageRequest.Builder(LocalContext.current)
-            .data(PhotoApi.IMAGE_BASE_URL + detailsState.photo?.url)
+            .data(/*PhotoApi.IMAGE_BASE_URL +*/ detailsState.photo?.url)
             //.size(Size.ORIGINAL)
+            .setHeader("Authorization", PhotoApi.API_KEY)
             .build()
     ).state
 
@@ -85,7 +81,6 @@ fun DetailsScreen(backStackEntry: NavBackStackEntry, navController: NavControlle
                             .fillMaxWidth()
                             .padding(top = 10.dp),
                     ) {
-                        //или через if
                         detailsState.photo?.let { photo ->
                             Text(
                                 modifier = Modifier//.padding(start = 16.dp)
@@ -111,9 +106,6 @@ fun DetailsScreen(backStackEntry: NavBackStackEntry, navController: NavControlle
         },
         bottomBar = {
             if (ImageState is AsyncImagePainter.State.Success) {
-
-                //кнопка скачивания и кнопка для закладки
-
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -122,24 +114,10 @@ fun DetailsScreen(backStackEntry: NavBackStackEntry, navController: NavControlle
                 ) {
                     Button(
                         onClick = {
-                            navController.navigate("Home")
-                            //download
-
-                            //add path logic
-//                            val downloader = AndroidDownloader(this)
-//                            downloader.downloadFile("")
-//
-
+                            val downloader = AndroidDownloader(context)
+                            detailsState.photo?.url?.let { downloader.downloadFile(it) }
                         }
                     ) {
-//                        Icon(
-//                            imageVector = Icons.Default.Download,
-//                            contentDescription = ""
-//                        )
-//                        Text(
-//                            modifier = Modifier.padding(start = 16.dp),
-//                            text = stringResource(R.string.explore)
-//                        )
                         Icon(
                             painter = painterResource(id = R.drawable.download_button),
                             contentDescription = "Download"
@@ -147,15 +125,14 @@ fun DetailsScreen(backStackEntry: NavBackStackEntry, navController: NavControlle
                     }
                     Button(
                         onClick = {
-                            navController.navigate("Home")
-                            //смена стейта, отрисовка другой иконки и добавление в избранные
+
+                            //!detailsState.isFavorite
+                            //add to bookmarkedList detailsState.photo.id
+                            //upsertBookmarkedPhotoList(//BList)
+                            isSelected = !isSelected
+
                         }
                     ) {
-//                        Icon(
-//                            selected = R.drawable.bookmark_active,
-//                            unselected = R.drawable.bookmark_inactive,
-//                            contentDescription = ""
-//                        )
                         Icon(
                             painter = painterResource(
                                 id = if (isSelected) R.drawable.bookmark_active else R.drawable.bookmark_inactive
@@ -179,9 +156,9 @@ fun DetailsScreen(backStackEntry: NavBackStackEntry, navController: NavControlle
                 if (ImageState is AsyncImagePainter.State.Error) {
                     Box(
                         modifier = Modifier
-                            .fillMaxSize(),
-                        //.clip(RoundedCornerShape(12.dp))
-                        //.background(MaterialTheme.colorScheme.primaryContainer),
+                            .fillMaxSize()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.primaryContainer),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(

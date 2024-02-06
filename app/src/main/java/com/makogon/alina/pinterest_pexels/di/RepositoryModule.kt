@@ -1,5 +1,7 @@
 package com.makogon.alina.pinterest_pexels.di
 
+import com.makogon.alina.pinterest_pexels.photoList.data.repository.BookmarkListRepositoryImpl
+import com.makogon.alina.pinterest_pexels.photoList.data.repository.PhotoListRepositoryImpl
 import com.makogon.alina.pinterest_pexels.photoList.domain.repository.BookmarkListRepository
 import com.makogon.alina.pinterest_pexels.photoList.domain.repository.PhotoListRepository
 import dagger.Binds
@@ -14,7 +16,7 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindPhotoRepository(
-        photoListRepositoryImpl: PhotoListRepository
+        photoListRepositoryImpl: PhotoListRepositoryImpl
     ): PhotoListRepository
 }
 
@@ -24,6 +26,6 @@ abstract class BookmarksRepositoryModule {
     @Binds
     @Singleton
     abstract fun bindBookmarksRepository(
-        bookmarkListRepositoryImpl: BookmarkListRepository
+        bookmarkListRepositoryImpl: BookmarkListRepositoryImpl
     ): BookmarkListRepository
 }
